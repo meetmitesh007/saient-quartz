@@ -3,7 +3,7 @@ name: Build Saient Quartz for Android (CPU Only)
 on:
   push:
     branches: [ "master", "main" ]
-  workflow_dispatch: # This adds the manual "Run workflow" button
+  workflow_dispatch: # Allows manual trigger button
 
 jobs:
   build-android-cpu:
@@ -20,8 +20,12 @@ jobs:
         distribution: 'zulu'
         java-version: '17'
 
-    - name: Set up Android NDK
+    - name: Set up Android NDK & Auto-Accept Licenses
       uses: android-actions/setup-android@v3
+
+    - name: Force Accept Android Licenses
+      run: |
+        yes | sdkmanager --licenses || true
 
     - name: Set up Rust Toolchain
       uses: dtolnay/rust-toolchain@stable
@@ -33,7 +37,6 @@ jobs:
 
     - name: Compile Native Engine for CPU
       run: |
-        # Checks if Cargo.toml exists before compiling to avoid empty repository errors
         if [ -f "Cargo.toml" ]; then
           cargo ndk --target aarch64-linux-android --android-platform 24 build --release --no-default-features
         else
@@ -43,3 +46,4 @@ jobs:
       env:
         CFLAGS: "-march=armv8-a+simd+crypto"
         RUSTFLAGS: "-C target-feature=+neon"
+        
