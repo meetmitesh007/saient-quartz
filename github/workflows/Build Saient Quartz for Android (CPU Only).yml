@@ -1,0 +1,48 @@
+name: Build Saient Quartz for Android (CPU Only)
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  workflow_dispatch: # Enables the manual "Run workflow" button in your browser
+
+jobs:
+  build-android-cpu:
+    name: Compile Android CPU-Only arm64-v8a
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Java Development Kit
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+
+    - name: Set up Android NDK
+      uses: android-actions/setup-android@v3
+
+    - name: Set up Rust Toolchain
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: aarch64-linux-android
+
+    - name: Install Cargo NDK Extension
+      run: cargo install cargo-ndk
+
+    - name: Compile Native Engine for CPU
+      run: |
+        # Cross-compiles for Android without heavy Vulkan graphics requirements
+        cargo ndk --target aarch64-linux-android --android-platform 24 build --release --no-default-features
+      env:
+        CFLAGS: "-march=armv8-a+simd+crypto" # Optimizes code for Cortex-A55 SIMD math
+        RUSTFLAGS: "-C target-feature=+neon"
+
+    - name: Upload Android Quartz Engine Binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: saient-quartz-android-cpu
+        path: target/aarch64-linux-android/release/quartz
+        if-no-files-found: warn
+        
