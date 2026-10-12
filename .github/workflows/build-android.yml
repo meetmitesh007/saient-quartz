@@ -1,0 +1,37 @@
+name: Build Android Binary
+
+on:
+  workflow_dispatch: # Allows you to run this manually anytime
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Android NDK
+        uses: android-actions/setup-android@v3
+        with:
+          api-level: 24
+          ndk-version: 26.1.10909125
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android
+
+      - name: Make Script Executable
+        run: chmod +x ./scripts/build-android-arm64.sh
+
+      - name: Run Build Script
+        run: |
+          export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/26.1.10909125
+          ./scripts/build-android-arm64.sh
+
+      - name: Upload Finished File
+        uses: actions/upload-artifact@v4
+        with:
+          name: quartz-android-cpu
+          path: target/aarch64-linux-android/release/quartz
+          
