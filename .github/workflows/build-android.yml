@@ -1,7 +1,7 @@
 name: Build Android Binary
 
 on:
-  workflow_dispatch: # Allows you to run this manually anytime
+  workflow_dispatch:
 
 jobs:
   build:
@@ -10,11 +10,18 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Android NDK
-        uses: android-actions/setup-android@v3
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
-          api-level: 24
-          ndk-version: 26.1.10909125
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Android SDK & NDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install NDK via SDK Manager
+        run: |
+          sdkmanager --install "ndk;26.1.10909125"
 
       - name: Setup Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
