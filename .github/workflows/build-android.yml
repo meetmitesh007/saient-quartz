@@ -16,16 +16,15 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Setup Android SDK & NDK
-        uses: android-actions/setup-android@v3
-
-      - name: Accept Android SDK Licenses
+      - name: Auto-Accept Android Licenses
         run: |
-          yes | sdkmanager --licenses
+          mkdir -p $ANDROID_HOME/licenses
+          echo -e "\n2c4df568181b4770e940f9c283ad7b089c2c5603\n84831b9409646a918e30573bab4c9c91346d8abd\n504667f4c0de7af1a06de9f4b1727b84351f2910\n893a5a405b3b6482a5227d86a5718286a11e0f8a\n2f4c53d261e4122d5272b22e11432f8f533f8950\ne4403081e75c58b196023cbbd9e83fac9d5b43b2\nf3174d55c3c6ef0eee7db93957f85cc8132d7259\n33b6a2b649d2171cd0e3de28bc1f1f92e07347b0\n8a6dbcd8f5412808c104e76a6058a9e083c27e85" > $ANDROID_HOME/licenses/android-sdk-license
+          echo -e "\n893a5a405b3b6482a5227d86a5718286a11e0f8a" > $ANDROID_HOME/licenses/android-sdk-preview-license
 
-      - name: Install NDK via SDK Manager
+      - name: Install NDK
         run: |
-          sdkmanager --install "ndk;26.1.10909125"
+          ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --install "ndk;26.1.10909125"
 
       - name: Setup Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
