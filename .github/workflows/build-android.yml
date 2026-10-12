@@ -16,7 +16,7 @@ jobs:
           targets: aarch64-linux-android
 
       - name: Setup Android NDK Toolchain
-        uses: napi-rs/android-cross@v1
+        uses: napi-rs/android-cross-action@v1
         with:
           target: aarch64-linux-android
 
